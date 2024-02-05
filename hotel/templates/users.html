@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .user-table th, .user-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .user-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .user-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-user-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-user-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="button-container">
+    <a href="{% url 'register' %}" class="add-user-button">Add New User</a>
+</div>
+
+<h1>User List</h1>
+
+<br>
+
+<div class="table-container">
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Mail</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th>Contact Number</th>
+                <th>Access Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.age }}</td>
+                <td>{{ user.address }}</td>
+                <td>{{ user.contact_number }}</td>
+                <td>{{ user.access_type }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No users available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

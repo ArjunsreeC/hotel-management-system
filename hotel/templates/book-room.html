@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Room{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the form and elements */
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .view-all-container {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .view-all-link {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .view-all-link:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        float: right;
+        margin-right: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    .room-info-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* Style individual room info divs */
+    .room-info {
+        display: inline-block;
+        vertical-align: top;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        text-align: center;
+        background-color: #f5f5f5;
+        margin-bottom: 10px;
+
+    }
+        /* CSS to style the "Add" button */
+    .add-button {
+        float: right; /* Align the button to the right */
+    }
+    .upgrade-button {
+        float: right; /* Align the button to the right */
+    }
+
+
+</style>
+
+<h1>Book Room - {{room.room_type}} </h1>
+<div class="view-all-container">
+    <a href="{% url 'rooms' %}" class="view-all-link">View All</a>
+</div>
+<div>
+    <b>**max members allowed per room {{ room.max_capacity }}</b>
+    <p>
+        <br>
+
+        {{room.room_description}}
+
+        <br>
+        <br>
+        Features:
+
+        <ul>
+            {% for item in room.amenities %}
+            <li>
+                {{ item }}
+            </li>
+            {% endfor %}
+        </ul>
+
+    </p>
+    
+</div>
+
+<form id="booking-form" method="post">
+    {% csrf_token %}
+    <div class="form-field" style="display: inline-block; margin-right: 10px;">
+        <label for="{{ booking_form.check_in_date.id_for_label }}">Check-in:</label>
+        {{ booking_form.check_in_date }}
+        {% if booking_form.check_in_date.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.check_in_date.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div class="form-field" style="display: inline-block;">
+        <label for="{{ booking_form.check_out_date.id_for_label }}">Check-out:</label>
+        {{ booking_form.check_out_date }}
+        {% if booking_form.check_out_date.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.check_out_date.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <br><br>
+
+    <div class="form-field" style="display: inline-block; margin-right: 10px;">
+        <label for="{{ booking_form.is_food_included.id_for_label }}">Food:</label>
+        {{ booking_form.is_food_included }}
+        {% if booking_form.is_food_included.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.is_food_included.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field" style="display: inline-block;">
+        <label for="{{ booking_form.is_food_included.id_for_label }}">Additional bed:</label>
+        {{ booking_form.additional_bed }}
+        {% if booking_form.additional_bed.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.additional_bed.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br><br>
+
+    <div class="form-field" style="display: inline-block; margin-right: 10px;">
+        <label for="{{ booking_form.adults_count.id_for_label }}">Adults:</label>
+        {{ booking_form.adults_count }}
+        {% if booking_form.adults_count.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.adults_count.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div id="single-room-info" class="room-info" style="display: none;"></div>
+    <div id="multiple-room-info" class="room-info" style="display: none;"></div>
+    <input type="hidden" id="id_selected_rooms" name="selected_rooms" value={{room.room_number}}>
+
+    <div class="form-field" style="display: inline-block;">
+        <label for="{{ booking_form.adults_count.id_for_label }}">Kids:</label>
+        {{ booking_form.kids_count }}
+        {% if booking_form.kids_count.errors %}
+            <ul class="errorlist">
+                {% for error in booking_form.kids_count.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <br><br>
+    <div style="text-align: right;">
+        <div id="total-amount" style="display: inline-block; margin-right: 10px;">Total Amount: <strong>INR 3750.00</strong></div>
+    </div>
+    <div style="text-align: right;">
+        <div id="amount-breakdown" style="display: inline-block;">
+            <div>Room Rate: INR 3750.00</div>
+            <div>Food: INR 0.00</div>
+            <div>Additional Bed: INR 0.00</div>
+        </div>
+    </div>
+    <br>
+    <button type="submit" id="book-button" {% if is_payment %}disabled{% endif %}>Book</button>
+    
+</form>
+
+<script>
+    const roomRate = {{ room.room_rates.average|default:499 }};
+    const foodField = document.getElementById("id_is_food_included");
+    const additionalBedField = document.getElementById("id_additional_bed");
+    const totalAmountField = document.getElementById("total-amount");
+    const amountBreakdownField = document.getElementById("amount-breakdown");
+
+    function calculateTotalAmount(optionalValue) {
+        const foodPrice = 1000;
+        const additionalBedPrice = 500;
+
+        const foodValue = foodField.checked;
+        const additionalBedValue = additionalBedField.checked;
+
+        let totalAmount = roomRate +
+            (foodValue ? foodPrice : 0) +
+            (additionalBedValue ? additionalBedPrice : 0);
+
+        console.log("...",totalAmount, optionalValue)
+
+        if (optionalValue && optionalValue > 0) {
+            totalAmount += optionalValue;
+        }
+
+        totalAmountField.innerHTML = `<strong>Total</strong><br>
+        <strong>INR ${totalAmount.toFixed(2)}</strong><br>`;
+
+        amountBreakdownField.innerHTML = `<br>
+            Room Rate: INR ${roomRate.toFixed(2)}<br>
+            Food: INR ${(foodValue ? foodPrice : 0).toFixed(2)}<br>
+            Additional Bed: INR ${(additionalBedValue ? additionalBedPrice : 0).toFixed(2)}<br>`;
+    }
+
+    foodField.addEventListener("change", calculateTotalAmount);
+    additionalBedField.addEventListener("change", calculateTotalAmount);
+
+    // Initial calculation
+    calculateTotalAmount();
+
+    var maxCapacity = {{ room.max_capacity }};
+    var adultsCount = parseInt(document.getElementById("id_adults_count").value);
+
+    document.getElementById("book-button").addEventListener("click", function(event) {
+        console.log(maxCapacity, adultsCount)
+        if (maxCapacity < adultsCount) {
+            event.preventDefault(); 
+            const data = {
+                maxCapacity: maxCapacity,
+                adultsCount: adultsCount
+            };
+            const url = '/get-rooms/';
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    populateRoomInfo("single-room-info", response.single_room, 1);
+                    populateRoomInfo("multiple-room-info", response.mutliple_room, 2);
+                } else {
+                    console.error('Request failed with status:', xhr.status);
+                }
+            };
+
+            xhr.onerror = function() {
+                console.error('Network error occurred');
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
+    });
+
+    function populateRoomInfo(divId, roomData, type) {
+        const div = document.getElementById(divId);
+        if (roomData) {
+            div.style.display = 'block';
+            if (type == 2){
+                div.innerHTML = `
+            <h2>${roomData.room_type} <button type="button" id="add-button" class="add-button">Add</button></h2>
+                Room Number: <span class="room-number">103</span><br>
+                Max Guests: <span class="max-capacity">5</span><br>
+                Max Guests: <span class="amount">${roomData.room_rates.average}</span><br>
+            `;
+            }
+            else{
+                div.innerHTML = `
+            <h2>${roomData.room_type} <button type="button" class="upgrade-button" href="rooms">Upgrade</button></h2>
+                Room Number: <span class="room-number">${roomData.room_number}</span><br>
+                Max Guests: <span class="max-capacity">${roomData.max_capacity}</span><br>
+                Max Guests: <span class="amount">${roomData.room_rates.average}</span><br>
+            `;
+            }
+
+        }
+    }
+
+    const selectedRoomsField = document.getElementById('id_selected_rooms');
+    const selectedRoomNumbers = [];
+
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('add-button')) {
+            const button = event.target;
+            const roomInfoDiv = button.closest('.room-info');
+            if (!roomInfoDiv) {
+                return; // Exit if no .room-info element found
+            }
+            const roomNumber = roomInfoDiv.querySelector('.room-number').textContent;
+            const maxCapacityText = roomInfoDiv.querySelector('.max-capacity').textContent;
+            const amount = parseInt(roomInfoDiv.querySelector('.amount').textContent);
+            const roomMaxCapacity = parseInt(maxCapacityText, 10);
+
+            
+
+            if (button.textContent === 'Add') {
+                button.textContent = 'Remove';
+                calculateTotalAmount(amount)
+                // Add the room number to the selectedRoomNumbers array
+                selectedRoomNumbers.push(roomNumber);
+                maxCapacity = maxCapacity + roomMaxCapacity;
+            } else {
+                button.textContent = 'Add';
+                console.log(amount)
+                calculateTotalAmount(-amount)
+                // Remove the room number from the selectedRoomNumbers array
+                const index = selectedRoomNumbers.indexOf(roomNumber);
+                if (index > -1) {
+                    selectedRoomNumbers.splice(index, 1);
+                }
+                maxCapacity = maxCapacity - roomMaxCapacity;
+            }
+
+            // Update the hidden field value with selected room numbers
+            selectedRoomsField.value = selectedRoomNumbers.join(',');
+            console.log(selectedRoomsField, maxCapacity);
+        }
+        if (event.target && event.target.classList.contains('upgrade-button')) {
+            const button = event.target;
+            const roomInfoDiv = button.closest('.room-info');
+            const roomNumber = roomInfoDiv.querySelector('.room-number').textContent;
+            window.location.href = '/rooms/' + roomNumber + '/book/';
+        }
+    });
+
+
+</script>
+
+
+
+
+{% endblock %}

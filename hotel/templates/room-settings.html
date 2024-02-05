@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .room-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .room-table th, .room-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .room-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .room-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-room-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-room-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="button-container">
+    <a href="{% url 'add_room_rate' %}" class="add-room-button">Add Rates</a>
+    <a href="{% url 'add_room' %}" class="add-room-button">Add New Room</a>
+</div>
+
+<h2>Room Types <button class="new-button"><a href="{% url 'add_room_type' %}">Add New</a></button></h2>
+
+<br>
+
+<div class="table-container">
+    <table class="room-table" id="room-type">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in room_types %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.name }}</td>
+                <td>
+                    <button class="delete-button" data-room-type-id="{{ item.id }}">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No Data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br><br>
+
+<h2>Amenity Types <button class="new-button"><a href="{% url 'add_aminity_type' %}">Add New</a></button></h2>
+
+<br>
+
+<div class="table-container">
+    <table class="room-table" id="amenity-type">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in amenity_types %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.name }}</td>
+                <td>
+                    <button class="delete-button" data-amenity-type-id="{{ item.id }}">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No Data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br><br>
+
+<h2>Service Types <button class="new-button"><a href="{% url 'add_service_type' %}">Add New</a></button></h2>
+
+<br>
+
+<div class="table-container">
+    <table class="room-table" id="services-type">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Name</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in service_types %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.cost }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No Data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load my_custom_tags %}
+
+{% block title %}Room {{ room.room }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .amenity-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .amenity-table th, .amenity-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .amenity-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .amenity-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-amenity-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-amenity-button:hover {
+        background-color: #0056b3;
+    }
+
+
+    .update-button {
+        background-color: green;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 100px;
+        color: #fff;
+
+    }
+
+    .cancel-button {
+        background-color: red;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 100px;
+        color: #fff;
+
+    }
+    <style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    /* Header Styles */
+    h1 {
+        color: #333;
+        font-size: 28px;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Star Rating Styles */
+    .star-rating {
+        color: #FFD700; /* Gold color for stars */
+        font-size: 24px;
+    }
+
+    /* Room Description Styles */
+    .room-description {
+        font-size: 16px;
+        margin: 20px 0;
+    }
+
+    /* Amenities Styles */
+    .amenities {
+        font-size: 16px;
+        list-style: disc;
+        padding-left: 20px;
+    }
+
+    /* Pricing and Booking Styles */
+    .price-container {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .price-label {
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .price-amount {
+        color: #007BFF;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .price-range {
+        color: #555;
+        font-size: 14px;
+    }
+
+    .book-button {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .book-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Customer Reviews Styles */
+    .customer-reviews {
+        margin-top: 20px;
+    }
+
+    .review-item {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .review-comments {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .rating-label {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* Additional Styles */
+    /* Add any additional styles you want here */
+
+    /* Thumbnail Image Styles */
+    .thumbnail-image {
+        cursor: pointer;
+        max-width: 100%;
+        max-height: 150px; /* Set the maximum height as needed */
+    }
+
+    /* Hidden Pop-up Styles */
+    .popup-box {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1;
+    }
+
+    .popup-content {
+        display: block;
+        margin: 0 auto;
+        max-width: 80%;
+        max-height: 80%;
+    }
+
+    /* Close Button Styles */
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 30px;
+        cursor: pointer;
+        color: white;
+    }
+
+</style>
+
+<h1>{{ room.room_type }} Room <br>{{ room.room_rating|star_rating }}</h1>
+
+
+<br>
+<div>
+    <br>
+    <p>It blends luxury and elegance with legendary hospitality for an incredible and rewarding experience, offers the ultimate high-end living experience! </p>
+    <br>
+    Max Guests - {{ room.max_capacity }}
+    <br><br>
+    <h3>Amenities</h3>
+    <br>
+    <ul>
+        {% for amenity in amenities %}
+        <li>{{ amenity.type__name }}</li>
+        {% endfor %}
+    </ul>
+    <h3>Room Images:</h3>
+    {% if reviews %}
+    <div>
+        {% for image in room_images %}
+            <img src="{{ image.image.url }}" alt="Image Preview" class="thumbnail-image" onclick="openImagePopup('{{ image.image.url }}')">
+        {% endfor %}
+    </div>
+    <!-- Hidden Pop-up Box -->
+    <div id="imagePopup" class="popup-box">
+        <span class="close" onclick="closeImagePopup()">&times;</span>
+        <img src="" alt="Image Preview" class="popup-content" id="popupImage">
+    </div>
+    {% else %}
+    <div>
+        <br>
+        No preview available.
+    </div>
+    {% endif %}
+    <br>
+    <div style="float: right;">
+        <b>INR. {{room.room_rates.average}}</b>
+        <br>
+        ({{room.room_rates.lowest}}-{{room.room_rates.highest}})
+        <br>
+        <br>
+        <button class="book-button">Book Now</button>
+    </div>
+</div>
+<br>
+
+<br>
+<div>
+    <h3>
+        Customer Reviews
+    </h3>
+    <br>
+    <div>
+        {% if reviews %}
+            {% for review in reviews %}
+            <div>
+                <b>Arjunsree : </b>
+                {{ review.comments }}<br><br>
+                <div style="display: flex;">
+                    <strong style="width: 15ch;">Cleanliness :</strong> {{ review.cleanliness_rating|star_rating }}<br>
+                </div>
+                <div style="display: flex;">
+                    <strong style="width: 15ch;">Service :</strong> {{ review.service_rating|star_rating }}<br>
+                </div>
+                <div style="display: flex;">
+                    <strong style="width: 15ch;">Food Quality :</strong> {{ review.food_quality|star_rating }}<br>
+                </div>
+                <div style="display: flex;">
+                    <strong style="width: 15ch;">Value for Money :</strong> {{ review.value_for_money|star_rating }}<br>
+                </div>
+                <br>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                No ratings available.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".book-button").click(function () {
+            var roomId = $(this).data("room-id");
+            window.location.href = '/rooms/' + '101' + '/book/';
+        });
+    });
+    function openImagePopup(imageUrl) {
+    var popup = document.getElementById("imagePopup");
+    var popupImage = document.getElementById("popupImage");
+
+    // Set the image source in the popup
+    popupImage.src = imageUrl;
+
+    // Show the popup
+    popup.style.display = "block";
+}
+
+function closeImagePopup() {
+    var popup = document.getElementById("imagePopup");
+
+    // Hide the popup
+    popup.style.display = "none";
+}
+</script>
+{% endblock %}

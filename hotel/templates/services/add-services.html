@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_edit %}
+    Edit Service
+    {% else %}
+    Reqest Service
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the form and elements */
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .view-all-container {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .view-all-link {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .view-all-link:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        float: right;
+        margin-right: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% if is_edit %}
+    <h1>Edit Room Service</h1>
+{% else %}
+    <h1>Request Room Service</h1>
+{% endif %}
+
+<div class="view-all-container">
+    <a href="{% url 'add_service_type' %}" class="view-all-link">Add Type</a>
+    <a href="{% url 'services' %}" class="view-all-link">View All</a>
+</div>
+
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-field">
+        <label for="{{ form.service_type.id_for_label }}">Type:</label>
+        {{ form.service_type }}
+        {% if form.service_type.errors %}
+            <ul class="errorlist">
+                {% for error in form.service_type.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <br>
+    <div class="form-field">
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+            <ul class="errorlist">
+                {% for error in form.description.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ form.room_reference.id_for_label }}">Room:</label>
+        {{ form.room_reference }}
+        {% if form.room_reference.errors %}
+            <ul class="errorlist">
+                {% for error in form.room_reference.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <br>
+    <div class="form-field">
+        <label for="{{ form.status.id_for_label }}">Complete Status:</label>
+        {{ form.status }}
+        {% if form.status.errors %}
+            <ul class="errorlist">
+                {% for error in form.status.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br><br>
+
+    {% if is_edit %}
+        <button type="submit">Update</button>
+    {% else %}
+        <button type="submit">Save</button>
+    {% endif %}
+
+</form>
+
+{% endblock %}

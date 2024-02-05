@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hotel{% endblock %}</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, h3, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 36px;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+
+        .login-register a {
+            color: #ff0000;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex-grow: 1;
+            width: 100%;
+            margin: 0 auto;
+            padding: 50px;
+        }
+
+        .edit-button {
+            background-color: #808080; /* Blue background color */
+            color: #ffffff; /* Text color */
+            border: none; /* Remove the button border */
+            padding: 12px 24px; /* Padding around the text */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Cursor style on hover */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s; /* Smooth background color transition on hover */
+            width: 75px; /* Fixed width for the edit button (adjust as needed) */
+        }
+
+        /* Hover effect for the "edit-button" (Blue) */
+        .edit-button:hover {
+            background-color: #b8b8b8; /* Darker blue background color on hover */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>THE HOTEL</h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'rooms' %}">Rooms</a></li>
+                    <li><a href="{% url 'menu' %}">Food & Bevrages</a></li>
+                    {% if access_type == 'Customer' %}
+                    <li><a href="{% url 'parkings' %}">Parkings</a></li>
+                    {% endif %}
+                    {% if access_type == 'Admin' or access_type == 'Owner' %}
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'parkings' %}">Parkings</a></li>
+                    <li><a href="{% url 'users' %}">Users</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'amenities' %}">Amenities</a></li>
+                    <li><a href="{% url 'bookings' %}">Bookings</a></li>
+                    <li><a href="{% url 'room_settings' %}">Settings</a></li>
+                    {% endif %}
+                    {% if access_type == 'Staff' %}
+                    <li><a href="{% url 'amenities' %}">Amenities</a></li>
+                    <li><a href="{% url 'bookings' %}">Bookings</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="login-register">
+                {% if logged_in %}
+                    <a href="{% url 'my_bookings' %}">My Bookings</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'signup' %}">Sign up</a>
+                {% endif %}
+            </div>
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <footer>
+        &copy; 2023 Hotel
+    </footer>
+</body>
+</html

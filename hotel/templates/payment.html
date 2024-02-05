@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Room{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the form and elements */
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .view-all-container {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .view-all-link {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .view-all-link:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        float: right;
+        margin-right: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<h1>Book Room</h1>
+<div class="view-all-container">
+    <a href="{% url 'rooms' %}" class="view-all-link">View All</a>
+</div>
+
+<form id="payment-form" method="post">
+    {% csrf_token %}
+    <div class="form-field">
+        <label for="{{ payment_form.payment_type.id_for_label }}">Payment Type:</label>
+        {{ payment_form.payment_type }}
+        {% if payment_form.payment_type.errors %}
+            <ul class="errorlist">
+                {% for error in payment_form.payment_type.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ payment_form.amount.id_for_label }}">Amount:</label>
+        {{ payment_form.amount }}
+        {% if payment_form.amount.errors %}
+            <ul class="errorlist">
+                {% for error in payment_form.amount.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br><br>
+
+    <button type="submit">Pay</button>
+</form>
+
+{% endblock %}

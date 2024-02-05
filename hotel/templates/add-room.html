@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if is_edit %}
+    Edit Room - {{ room.room_number }}
+{% else %}
+    Add Room
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the form and elements */
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .view-all-container {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .view-all-link {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .view-all-link:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        float: right;
+        margin-right: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% if is_edit %}
+    <h1>Edit Room - {{ room.room_number }}</h1>
+{% else %}
+    <h1>Add Room</h1>
+{% endif %}
+<div class="view-all-container">
+    <a href="{% url 'rooms' %}" class="view-all-link">View All</a>
+</div>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-field">
+        <label for="{{ form.room_number.id_for_label }}">Number:</label>
+        {{ form.room_number }}
+        {% if form.room_number.errors %}
+            <ul class="errorlist">
+                {% for error in form.room_number.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ form.max_capacity.id_for_label }}">Capacity:</label>
+        {{ form.max_capacity }}
+        {% if form.max_capacity.errors %}
+            <ul class="errorlist">
+                {% for error in form.max_capacity.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ form.room_description.id_for_label }}">Description:</label>
+        {{ form.room_description }}
+        {% if form.room_description.errors %}
+            <ul class="errorlist">
+                {% for error in form.room_description.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ form.room_type.id_for_label }}">Type:</label>
+        {{ form.room_type }}
+        {% if form.room_type.errors %}
+            <ul class="errorlist">
+                {% for error in form.room_type.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="{{ image_form.image.id_for_label }}">Images:</label>
+        {{ image_form.image }}
+        {% if image_form.image.errors %}
+            <ul class="errorlist">
+                {% for error in image_form.image.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+{% endblock %}

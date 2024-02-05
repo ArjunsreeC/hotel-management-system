@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Details{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .amenity-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .amenity-table th, .amenity-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .amenity-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .amenity-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-amenity-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-amenity-button:hover {
+        background-color: #0056b3;
+    }
+
+
+    .update-button {
+        background-color: green;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 100px;
+        color: #fff;
+
+    }
+
+    .cancel-button {
+        background-color: red;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 100px;
+        color: #fff;
+        float: right;
+    }
+    .booking-details {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    }
+
+    .date-range {
+        font-weight: bold;
+    }
+
+    .details-section {
+        margin-bottom: 10px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Additional styling for the new button classes */
+    .check-in-button, .check-out-button {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+    .check-in-button:hover, .check-out-button:hover {
+        background-color: #0056b3;
+    }
+    body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        h1 {
+        display: inline-block;
+    }
+        th {
+            background-color: #f2f2f2;
+        }
+</style>
+
+<br>
+<h1>Booking Details</h1>
+{% if booking_data.status == "Reservation" %}
+<button class="cancel-button" data-amenity-id="{{ booking_data.booking_id }}">Cancel</button>
+{% endif %}
+<table>
+    <tr>
+        <th>Field</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Booking ID</td>
+        <td>{{ booking_data.booking_id }}</td>
+    </tr>
+    <tr>
+        <td>Check-In Status</td>
+        <td>
+            {% if booking_data.check_in_status %}
+                Checked In
+            {% else %}
+                Not Checked In
+            {% endif %}
+        </td>
+        
+
+    </tr>
+    <tr>
+        <td>Booking Date</td>
+        <td>{{ booking_data.booking_date }}</td>
+    </tr>
+    <tr>
+        <td>Check-In Date</td>
+        <td>{{ booking_data.check_in_date }}</td>
+    </tr>
+    <tr>
+        <td>Check-Out Date</td>
+        <td>{{ booking_data.check_out_date }}</td>
+    </tr>
+    <tr>
+        <td>Number of Days</td>
+        <td>{{ booking_data.number_of_days }}</td>
+    </tr>
+    <tr>
+        <td>Food Included</td>
+        <td>
+            {% if booking_data.is_food_included %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </td>
+        
+    </tr>
+    <tr>
+        <td>Amount</td>
+        <td>{{ booking_data.amount }}</td>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td>{{ booking_data.status }}</td>
+    </tr>
+    <tr>
+        <td>Adults Count</td>
+        <td>{{ booking_data.adults_count }}</td>
+    </tr>
+    <tr>
+        <td>Kids Count</td>
+        <td>{{ booking_data.kids_count }}</td>
+    </tr>
+    <tr>
+        <td>Additional Bed</td>
+        <td>
+            {% if booking_data.additional_bed %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </td>
+        
+    </tr>
+    <tr>
+        <td>Room(s)</td>
+        <td>
+            {% for room_id in booking_data.room %}
+                {{ room_id.room_number }}
+            {% endfor %}
+        </td>
+        
+    </tr>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        $(document).ready(function () {
+
+        $(".cancel-button").click(function () {
+            var amenityId = $(this).data("amenity-id");
+            window.location.href = '/booking/' + amenityId + '/cancel/';
+        });
+
+    });
+// Function to check if the current date is within the booking date range
+// function isDateWithinRange(startDate, endDate) {
+//     const currentDate = new Date();
+//     return currentDate >= new Date(startDate) && currentDate <= new Date(endDate);
+// }
+
+// Attach an event listener to the buttons to check and disable them if needed
+// const bookingDivs = document.querySelectorAll('[data-amenity-id]');
+// bookingDivs.forEach(bookingDiv => {
+//     const checkInDate = bookingDiv.querySelector('.check-in-date').textContent;
+//     const checkOutDate = bookingDiv.querySelector('.check-out-date').textContent;
+//     const buttons = bookingDiv.querySelectorAll('.update-button, .cancel-button');
+
+//     if (!isDateWithinRange(checkInDate, checkOutDate)) {
+//         buttons.forEach(button => {
+//             button.setAttribute('disabled', 'true');
+//         });
+//     }
+// });
+</script>
+
+{% endblock %}

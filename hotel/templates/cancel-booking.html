@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Booking{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .room {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .room button {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .refund-button {
+        background-color: #007bff;
+        text-align: center !important;
+    }
+
+    .room h3 {
+    display: inline-block;
+    margin-right: 10px; /* Adjust the margin as needed */
+}
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .cancel-button, button {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .cancel-button:hover, button:hover {
+        background-color: #c82333;
+    }
+
+    button {
+        background-color: #007bff;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div>
+    <h1>Cancel Booking</h1>
+    <br>
+    <button class="refund-button" onclick="openRefundModal()" style="display: block; margin: 0 auto;">See Refund Policies</button>
+    <p>Total Paid Amount: {{ booking_data.amount }}</p>
+    <br>
+    <div>
+        {% for room in booking_data.room %}
+        <div class="room">
+            <h3 style="display: inline-block;">Room Number: {{ room.room_number }}</h3>
+            {% if booking_data.room|length > 1 %}
+                {% if room.room_number in booking_data.canceled_rooms %}
+                    <p>Status: Canceled</p>
+                {% else %}
+                    <form class="cancelRoomForm" method="post" style="display: inline-block;">
+                        {% csrf_token %}
+                        <button class="room-cancel-button" data-booking-id="{{ booking_data.booking_id }}" data-room-id="{{ room.room_number }}">Cancel</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+            <p>Type: {{ room.room_type }}</p>
+            <p>Capacity: {{ room.max_capacity }}</p>
+        </div>
+    {% endfor %}
+    
+    </div>
+    <div style="text-align: right;">
+        <form id="cancelBookingForm" method="post" style="display: inline-block;">
+            {% csrf_token %}
+            <button id="cancelBookingButton" class="cancel-button" data-booking-id="{{ booking_data.booking_id }}">Cancel Booking</button>
+        </form>    
+        <button style="display: inline-block;" onclick="goBack()">Back</button>
+    </div>    
+</div>
+
+<!-- Refund Policies Modal -->
+<div id="refundModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRefundModal()">&times;</span>
+        <h2>Refund Policies</h2>
+
+        <h3>Booking Cancelation:</h3>
+        <ul>
+            <li>Cancelation before 7 days: No charge</li>
+            <li>Cancelation within 7-2 days: 50% of booking fee</li>
+            <li>Cancelation within 2 days of check-in: 90% of booking fee</li>
+        </ul>
+
+        <h3>Room Cancelation:</h3>
+        <p>For rooms, the cancellation charge will be 50% of the fee for the canceled room only.</p>
+        <br>
+        <p><b>Please note that these policies may vary and are subject to change. Contact us for more details.</b></p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function openRefundModal() {
+        document.getElementById('refundModal').style.display = 'block';
+    }
+
+    function closeRefundModal() {
+        document.getElementById('refundModal').style.display = 'none';
+    }
+    function goBack() {
+        window.history.back();
+    }
+    $(document).ready(function () {
+        $("#cancelBookingForm").submit(function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var bookingId = $("#cancelBookingButton").data("booking-id");
+            var csrfToken = $("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/booking/" + bookingId + "/cancel/",
+                data: {
+                    csrfmiddlewaretoken: csrfToken
+                    // Include other data if needed
+                },
+                success: function (data) {
+                    // Handle success, if needed
+                    console.log("Booking canceled successfully.");
+                    alert("Refund amount: " + data.refund_amount);
+                    window.location.href = '/my-bookings/';
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle error
+                    console.error("Error canceling booking:", errorThrown);
+                }
+            });
+        });
+
+
+
+        $(".room-cancel-button").click(function (event) {
+            event.preventDefault();
+
+            var bookingId = $(this).data("booking-id");
+            var roomId = $(this).closest(".room").find(".room-cancel-button").data("room-id");
+            console.log(roomId)
+            var csrfToken = $(this).closest("form").find("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/booking/" + bookingId + "/room/" + roomId + "/cancel/",
+                data: {
+                    csrfmiddlewaretoken: csrfToken
+                    // Include other data if needed
+                },
+                success: function (data) {
+                    // Handle success, if needed
+                    console.log("Room canceled successfully.");
+                    alert("Refund amount: " + data.refund_amount);
+                    location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle error
+                    console.error("Error canceling room:", errorThrown);
+                }
+            });
+        });
+
+
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .room-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .room-table th, .room-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .room-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .room-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-room-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-room-button:hover {
+        background-color: #0056b3;
+    }
+
+
+.book-button {
+    background-color: #4CAF50; /* Green background color */
+    color: #fff; /* Text color */
+    border: none; /* Remove the button border */
+    padding: 12px 24px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style on hover */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s; /* Smooth background color transition on hover */
+}
+
+.book-button:hover {
+    background-color: #45A049; /* Darker green background color on hover */
+}
+
+.star-rating {
+            font-size: 24px;
+        }
+
+        .star-rating .fa-star {
+            color: gold;
+        }
+</style>
+
+{% if access_type == 'Admin' or access_type == 'Owner' %}
+    <div class="button-container">
+        <a href="{% url 'add_room_rate' %}" class="add-room-button">Add Rates</a>
+        <a href="{% url 'add_room' %}" class="add-room-button">Add New Room</a>
+    </div>
+{% endif %}
+
+<h1>Rooms</h1>
+
+<br>
+
+<div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.start_date }}
+        {{ form.end_date }}
+        {{ form.adults_count }}
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<br><br>
+
+<div class="table-container">
+    <table class="room-table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Rating (5)</th>
+                <th>Book Now</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr id="{{ room.room_number }}">
+                <td>{{ room.room_number }}</td>
+                <td>{{ room.room_type }}</td>
+                <td>{{ room.max_capacity }}</td>
+                <td>{{ room.room_description }}</td>
+                <td>INR {{ room.room_rates.average }} <br>({{ room.room_rates.lowest }} - {{ room.room_rates.highest }})</td>
+                <td  class="star-rating">
+                    {% if room.room_rating == 'NA' %}
+                    <p style="font-size: 10px;">NA</p>
+                    {% else %}
+                            {% for i in "12345" %}
+                            {% if i|add:0 <= room.room_rating %}
+                                <i>*</i>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="book-button" data-room-id="{{ room.room_number }}">Book</button>
+                </td>
+                <td>
+                    <button class="edit-button" data-room-id="{{ room.room_number }}">Edit</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No Rooms available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".book-button").click(function () {
+            var roomId = $(this).data("room-id");
+            window.location.href = '/rooms/' + roomId + '/book/';
+        });
+    });
+
+    const rows = document.querySelectorAll('tr[id]');
+    rows.forEach(row => {
+        row.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const roomNumber = row.id;
+            window.location.href = '/rooms/' + roomNumber + '/';
+        });
+    });
+
+    $(document).ready(function () {
+        $(".edit-button").click(function (event) {
+            event.stopPropagation(); // Stop event propagation
+            var roomId = $(this).data("room-id");
+            window.location.href = '/rooms/' + roomId + '/edit/';
+        });
+    });
+
+</script>
+{% endblock %}

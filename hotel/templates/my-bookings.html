@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Bookings{% endblock %}
+
+{% block content %}
+<style>
+
+        /* Updated button styles with icons */
+        .update-button, .cancel-button, .rating-button {
+        /* Your existing styles */
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s, opacity 0.3s;
+    }
+
+    .update-button:hover, .cancel-button:hover, .rating-button:hover {
+        background-color: #666; /* Darken the background color on hover */
+    }
+
+    /* Card-like styling for each booking entry */
+    .booking-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    /* Inline CSS for styling the table */
+    .amenity-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .amenity-table th, .amenity-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .amenity-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .amenity-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-amenity-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-amenity-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Style for the "Check In" button */
+.update-button {
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Add some padding for spacing */
+    margin-right: 10px; /* Add margin to separate buttons */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+/* Style for the "Cancel" button */
+.cancel-button {
+    background-color: #f44336; /* Red background color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Style for the "Rate Us" button with a new background color (orange) */
+.rating-button {
+    background-color: #ff6600; /* Orange background color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* Apply hover styles to all buttons */
+.update-button:hover, .cancel-button:hover, .rating-button:hover {
+    opacity: 0.9; /* Slightly reduce opacity on hover */
+}
+
+</style>
+
+<h1>My Bookings</h1>
+
+<br>
+
+<div class="table-container">
+    {% for booking in bookings %}
+    <div class="booking-card clickable-row" data-amenity-id="{{ booking.booking_id }}">
+        <h3>Booking Details</h3>
+        <p><strong>Booked Date:</strong> {{ booking.booking_date }}</p>
+        <p><strong>Check-in Date:</strong> {{ booking.check_in_date }}</p>
+        <p><strong>Status:</strong> {{ booking.status }}</p>
+        <div class="button-container">
+            {% if not booking.check_in_status and booking.status == "Reservation" %}
+                <p>Booking Expired</p>
+            {% else %}
+                {% if booking.status == "Reservation" %}
+                <button class="update-button" data-amenity-id="{{ booking.booking_id }}">Check In</button>
+                <button class="cancel-button" data-amenity-id="{{ booking.booking_id }}">Cancel</button>
+                {% endif %}
+                {% if booking.status == "CheckedIn" %}
+                    <button class="update-button" data-amenity-id="{{ booking.booking_id }}">Check Out</button>
+                {% endif %}
+            {% endif %}
+            {% if booking.status == "CheckedOut" %}
+            <button class="rating-button" data-amenity-id="{{ booking.booking_id }}">Rate Us</button>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p>No Data available.</p>
+    {% endfor %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".update-button").click(function () {
+            var amenityId = $(this).data("amenity-id");
+            window.location.href = '/booking/' + amenityId + '/update/';
+        });
+        $(".cancel-button").click(function () {
+            var amenityId = $(this).data("amenity-id");
+            window.location.href = '/booking/' + amenityId + '/cancel/';
+        });
+        $(".rating-button").click(function () {
+            var amenityId = $(this).data("amenity-id");
+            window.location.href = '/booking/' + amenityId + '/rate/';
+        });
+    });
+    const rows = document.querySelectorAll(".clickable-row");
+
+    rows.forEach(row => {
+        row.addEventListener("click", function() {
+            const bookingId = this.getAttribute("data-amenity-id");
+            console.log("...............", bookingId)
+            window.location.href = '/booking/' + bookingId + '/';
+        });
+    });
+</script>
+{% endblock %}

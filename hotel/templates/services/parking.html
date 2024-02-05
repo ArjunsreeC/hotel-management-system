@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}parkings{% endblock %}
+
+{% block content %}
+<style>
+    /* Inline CSS for styling the table */
+    .amenity-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .amenity-table th, .amenity-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .amenity-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .amenity-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .button-container {
+        text-align: right;
+        margin-bottom: 20px; /* Add some spacing between the button and the table */
+    }
+
+    .add-amenity-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-amenity-button:hover {
+        background-color: #0056b3;
+    }
+
+    .park-button {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 150px;
+}
+
+.park-button:hover {
+    background-color: #45A049;
+}
+
+.cancel-button {
+    background-color: #FF0000;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 150px;
+}
+
+.cancel-button:hover {
+    background-color: #A00000;
+}
+
+.parking-slots-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adjust as needed for your desired spacing */
+    max-width: 600px; /* Adjust the maximum width for your layout */
+    margin: 0 auto; /* Center the slots horizontally */
+}
+
+.parking-slot {
+    /* Add your slot styling here */
+    width: 48%; /* Adjust the width to control the number of columns */
+    margin-bottom: 10px; /* Adjust the margin for spacing between slots */
+}
+
+<style>
+    .crossed-out-symbol {
+        text-decoration: line-through; /* Add a line-through effect to the text */
+        color: red; /* You can customize the color as needed */
+    }
+</style>
+
+</style>
+
+{% if logged_in %}
+    {% if access_type == 'Admin' %}
+    <div class="button-container">
+        <a href="{% url 'add_parkings' %}" class="add-amenity-button">Add parkings</a>
+    </div>
+    {% endif %}
+{% endif %}
+
+<h1>Parking</h1>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Slots</title>
+    <style>
+        /* Add some basic styles for the parking slots */
+        .parking-slot {
+            width: 100px;
+            height: 100px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        /* Style for booked slots */
+        .booked {
+            background-color: #ff0000;
+        }
+    </style>
+
+
+    <br><br>
+    <div class="parking-slots-container">
+        {% for slot in parkings %}
+        <div id="{{ slot.parking_id }}" class="parking-slot{% if slot.is_booked %} booked{% endif %}" data-slot="{{ slot.user }}">
+            {% if slot.is_booked %}
+                <span class="crossed-out-symbol">✘</span>
+            {% else %}
+                <span>&#10004;</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script>
+        const parkingSlots = document.querySelectorAll('.parking-slot');
+    
+        parkingSlots.forEach(slot => {
+            slot.addEventListener('click', () => {
+                const isBooked = slot.classList.contains('booked');
+                const parkingId = slot.getAttribute('id');
+                const loggedUserId = {{ user_id }};
+                console.log(loggedUserId);
+                const slotUserId = slot.getAttribute('data-slot');
+                console.log(slotUserId);
+    
+                if (isBooked ) {
+                    const confirmed = window.confirm('Are you sure you want to cancel this booking?');
+    
+                    if (confirmed) {
+                        console.log("Cancelling...");
+                        window.location.href = `/parkings/${parkingId}/cancel/`;
+                    }
+                } else if (!isBooked) {
+                    console.log("Booking...");
+                    window.location.href = `/parkings/${parkingId}/book/`;
+                } else {
+                    alert(`Slot ${slot.getAttribute('data-slot')} is already booked.`);
+                }
+            });
+        });
+    </script>
+    
+    
+    
+    
+
+{% endblock %}

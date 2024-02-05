@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Hotel{% endblock %}
+
+{% block content %}
+<style>
+    .box-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-left: 50px;
+}
+
+.data-box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    width: 300px;
+}
+
+.box-item {
+    margin-bottom: 10px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.edit-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.no-data-box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    width: 300px;
+    text-align: center;
+}
+
+.search-box {
+    align-self: center;
+}
+
+.search-box label,
+    .search-box input,
+    .search-box button {
+        margin-bottom: 10px; /* Adjust the value as needed */
+    }
+
+</style>
+<h2>THE HOTEL</h2>
+<p>Welcome to our hotel!</p>
+<br><br>
+
+<div class="search-box">
+    <form method="post">
+        {% csrf_token %}
+        <label for="start_date">Check In:</label>
+        {{ form.start_date }}
+        
+        <label for="end_date">Check Out:</label>
+        {{ form.end_date }}
+        
+        <label for="adults_count">Guests:</label>
+        {{ form.adults_count }}
+        
+        <button type="submit">Check Availability</button>
+    </form>
+</div>
+
+
+<br><br>
+<div class="box-container">
+    {% for room in rooms %}
+    <div class="data-box" id="{{ room.room_number }}">
+
+        <div class="box-item" style="float: right;">
+            <button class="book-button" data-room-id="{{ room.room_number }}">Book Now</button>
+        </div>
+        <div class="box-item" style="text-align: center;">
+            <span class="value"><h3><b>Room - {{ room.room_number }}</b></span></h3>
+        </div>
+        <div class="box-item">
+            <span class="label">Type:</span>
+            <span class="value">{{ room.room_type }}</span>
+        </div>
+        <div class="box-item">
+            <span class="label">Adult:</span>
+            <span class="value">{{ room.max_capacity }}</span>
+        </div>
+        <div  class="box-item">
+            {% if room.room_rating == 'NA' %}
+            <p style="font-size: 10px;">****</p>
+            {% else %}
+                    {% for i in "12345" %}
+                    {% if i|add:0 <= room.room_rating %}
+                        <i>*</i>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="box-item">
+            <span class="value"> Stars from INR. {{ room.room_rates.lowest }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-data-box">No Rooms available.</div>
+    {% endfor %}
+</div>
+<br><br>
+<div style="text-align: right; padding-right: 100px;">
+    <p>
+        <a href="{% url 'rooms' %}" style="text-decoration: none; color: #007bff; font-weight: bold;">Find more Rooms >></a>
+    </p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Handle "Book Now" button clicks
+        $(".book-button").click(function (event) {
+            event.stopPropagation(); // Prevent the event from propagating to the parent div
+            var roomId = $(this).data("room-id");
+            // Check if the URL is generated correctly
+            console.log("Booking room " + roomId);
+            // Redirect to the booking page
+            window.location.href = '/rooms/' + roomId + '/book/';
+        });
+
+        // Handle room clicks
+        const rows = document.querySelectorAll('.data-box');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                const roomNumber = row.id;
+                // Check if the URL is generated correctly
+                console.log("Viewing room " + roomNumber);
+                // Redirect to the room details page
+                window.location.href = '/rooms/' + roomNumber + '/';
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}
